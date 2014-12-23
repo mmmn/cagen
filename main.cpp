@@ -14,9 +14,8 @@ void cd(std::string dir){
 
 void cp(std::string file, std::string location){
     cout << "Copying " << file << " to " << location << " ... " << endl;
-    std::stringstream cmd;
-    cmd << "copy " << file << ' ' << location;
-    cout << ((system(cmd.str().c_str()) == 0) ? "Success." : "Fail.") << endl;
+    cout << (CopyFile(file.c_str(), location.c_str(), FALSE)
+            ? "Success." : "Fail.") << endl;
 }
 
 void rm(std::string file){
@@ -53,10 +52,10 @@ int main(int argc, char* argv[]) {
     const std::string makecia{"decrypt and make.bat"};
     const std::string installcia{"install.cia"};
 
-    std::string rom = "rom.3ds";
+    const std::string rom = "rom.3ds";
 
-    cp(enclose(romName), enclose(rom));
-    cp(enclose(rom), enclose(step1));
+    cp(romName, rom);
+    cp(rom, step1 + rom);
     cd(step1);
 
     std::stringstream cmd;
@@ -66,7 +65,7 @@ int main(int argc, char* argv[]) {
     rm(rom);
 
     cd("..");
-    cp(enclose(step1 + nccInfo), enclose(forSD));
+    cp(step1 + nccInfo, forSD + nccInfo);
     rm(enclose(step1 + nccInfo));
 
     cout << '\n' << "Copy the data in " << enclose(forSD) << " to your " <<
@@ -76,9 +75,9 @@ int main(int argc, char* argv[]) {
             enclose(step2) << '.' << endl;
     system("pause");
 
-    cp(enclose(rom), enclose(step2));
+    cp(rom, step2 + rom);
     cd(step2);
-    exec(enclose(makecia));
+    exec(enclose("" + makecia));
 
     std::string cianame = romName;
     auto size = cianame.size();
@@ -86,7 +85,7 @@ int main(int argc, char* argv[]) {
     cianame[size-2] = 'i';
     cianame[size-1] = 'a';
 
-    cp(enclose(installcia), enclose("..\\" + cianame));
+    cp(installcia, "..\\" + cianame);
     rm(enclose(rom));
     rm(enclose(installcia));
     cd("..");
