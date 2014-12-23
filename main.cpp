@@ -20,12 +20,14 @@ std::string enterCopyMenu();
 std::string manualOrReload();
 void fail();
 void cd(std::string dir);
-void cp(std::string file, std::string location);
+void cp(std::string file, std::string destination);
+void cpDirContents(std::string dir, std::string destination);
 void mv(std::string file, std::string destination);
 void rm(std::string file);
 void exec(std::string cmd);
 bool exists(std::string path);
 std::string enclose(std::string str);
+std::vector<std::string> listDir(std::string directory);
 std::vector<std::string> getDrives();
 std::vector<std::string> getRemovableDrives(std::vector<std::string> drives);
 std::string find3dsDrive(std::vector<std::string> removableDrives);
@@ -39,6 +41,7 @@ int main(int argc, char* argv[]) {
     const std::string nccInfo{"ncchinfo.bin"};
     const std::string makecia{"decrypt and make.bat"};
     const std::string installcia{"install.cia"};
+    const std::string launcherdat{"Launcher.dat"};
     const std::string rom{"rom.3ds"};
 
     cout << "CIA Auto Generator" << endl;
@@ -64,7 +67,10 @@ int main(int argc, char* argv[]) {
 
     cout << "We now need to copy some data to your 3DS SD Card." << std::endl;
     std::string sdDrive = enterCopyMenu();
-
+    if(exists(sdDrive + launcherdat)){
+        mv(sdDrive + launcherdat, sdDrive + launcherdat + ".autobackup");
+    }
+    cpDirContents(forSD, sdDrive);
 
     cout << '\n' << "Copy the data in " << enclose(forSD) << " to your " <<
             "3DS SD Card. Turn on your 3DS. Go to System Settings" <<
@@ -168,6 +174,12 @@ void cp(std::string file, std::string location) {
     if (result == 0)
         fail();
 }
+void cpDirContents(std::string dir, std::string destination){
+    auto contents = listDir(dir);
+    for (auto &&file : contents){
+        cp(dir + file, destination);
+    }
+}
 void mv(std::string file, std::string destination){
     cout << "Renaming " << file << " to " << destination << " ... " << endl;
     BOOL result = MoveFile(file.c_str(), destination.c_str());
@@ -194,6 +206,21 @@ std::string enclose(std::string str) {
     result << '\"' << str << '\"';
     return result.str();
 }
+std::vector<std::string> listDir(std::string directory) {
+    std::vector<std::string> list{};
+    WIN32_FIND_DATA fileData;
+    auto fileHandle = FindFirstFile((directory + "*").c_str(), &fileData);
+    BOOL result;
+    do{
+        if (strcmp(fileData.cFileName, ".") != 0 &&
+                strcmp(fileData.cFileName, "..") != 0) {
+            list.push_back(fileData.cFileName);
+        }
+        result = FindNextFile(fileHandle, &fileData);
+    }while(result);
+    return list;
+}
+
 std::vector<std::string> getDrives() {
     std::vector<std::string> drives{};
     const int maxlen = 26*4+1;
