@@ -24,6 +24,7 @@ void cp(std::string file, std::string location);
 void mv(std::string file, std::string destination);
 void rm(std::string file);
 void exec(std::string cmd);
+bool exists(std::string path);
 std::string enclose(std::string str);
 std::vector<std::string> getDrives();
 std::vector<std::string> getRemovableDrives(std::vector<std::string> drives);
@@ -61,8 +62,8 @@ int main(int argc, char* argv[]) {
     cp(step1 + nccInfo, forSD + nccInfo);
     rm(step1 + nccInfo);
 
-    //cout << "We now need to copy some data to your 3DS SD Card." << std::endl;
-    //std::string sdDrive = enterCopyMenu();
+    cout << "We now need to copy some data to your 3DS SD Card." << std::endl;
+    std::string sdDrive = enterCopyMenu();
 
 
     cout << '\n' << "Copy the data in " << enclose(forSD) << " to your " <<
@@ -221,8 +222,7 @@ std::string find3dsDrive(std::vector<std::string> removableDrives) {
     for(auto &&drive : removableDrives){
         BOOL testPassed = TRUE;
         for (auto &&test : fileTests){
-            if (GetFileAttributes((drive + test).c_str()) == INVALID_FILE_ATTRIBUTES &&
-                    GetLastError() == ERROR_FILE_NOT_FOUND){
+            if (exists(drive + test)){
                 testPassed = FALSE;
             }
         }
@@ -231,4 +231,8 @@ std::string find3dsDrive(std::vector<std::string> removableDrives) {
         }
     }
     return "";
+}
+bool exists(std::string path){
+    return GetFileAttributes(path.c_str()) == INVALID_FILE_ATTRIBUTES &&
+            GetLastError() == ERROR_FILE_NOT_FOUND;
 }
