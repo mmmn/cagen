@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <vector>
+#include <set>
 #include <windows.h>
 
 using std::cout;
@@ -10,7 +11,13 @@ using std::endl;
 
 const std::string prompt = "\n>";
 
-bool getYN();
+bool getYN(
+    std::set<std::string> yes = {"y", "Y", "yes", "Yes"},
+    std::set<std::string> no = {"n", "N", "no", "No"}
+);
+
+std::string enterCopyMenu();
+std::string manualOrReload();
 void fail();
 void cd(std::string dir);
 void cp(std::string file, std::string location);
@@ -53,13 +60,9 @@ int main(int argc, char* argv[]) {
     cp(step1 + nccInfo, forSD + nccInfo);
     rm(step1 + nccInfo);
 
-    cout << '\n' << "Available Drives: \n" ;
-    auto drives = getDrives();
-    for (auto &&drive : drives){
-        cout << drive << '\n';
-    }
+    //cout << "We now need to copy some data to your 3DS SD Card." << std::endl;
+    //std::string sdDrive = enterCopyMenu();
 
-    std::string drive3ds = find3dsDrive(getRemovableDrives(getDrives()));
 
     cout << '\n' << "Copy the data in " << enclose(forSD) << " to your " <<
             "3DS SD Card. Turn on your 3DS. Go to System Settings" <<
@@ -88,20 +91,57 @@ int main(int argc, char* argv[]) {
     cout << endl;
     return 0;
 }
-bool getYN(){
+bool getYN(std::set<std::string> yes, std::set<std::string> no){
     std::string response;
     while(true){
         getline(cin, response);
-        if (response == "n" || response == "no" ||
-                response == "N" || response == "No") {
+        if (yes.find(response) != yes.end()) {
             return false;
         }
-        else if (response == "y" || response == "yes"  ||
-                response == "Y" || response == "Yes") {
+        else if (no.find(response) != no.end()) {
             return true;
         }
     }
 }
+std::string enterCopyMenu(){
+    cout << '\n' << "Available Drives: \n" ;
+    auto drives = getDrives();
+    for (auto &&drive : drives){
+        cout << drive << '\n';
+    }
+    cout << "Auto-Locate 3DS SD Card?" << prompt << std::flush;
+    if (getYN()){
+        auto foundSD = find3dsDrive(getRemovableDrives(getDrives()));
+        if (foundSD == ""){ // Not found
+            cout << "Could not find 3DS SD Card." << endl;
+            return manualOrReload();
+        }
+        else{
+            cout << "Is this the correct drive letter?\n" <<
+                    foundSD << prompt << std::flush;
+            if (getYN()){
+                return foundSD;
+            }
+            else{
+                return manualOrReload();
+            }
+        }
+    }
+}
+std::string manualOrReload(){
+    cout << "Would you like to reload the drives, " <<
+            "or manually specify which drive to copy to? (reload/manual)" <<
+            prompt << std::flush;
+    if(getYN(std::set<std::string>{"reload"}, std::set<std::string>{"manual"})){
+        return enterCopyMenu();
+    }else{
+        cout << "Type the full drive name exactly as it appears in the list above." <<
+                prompt << std::flush;
+        std::string drive{};
+        std::getline(cin, drive);
+        return drive;
+    }
+};
 void fail() {
     cout << "The previous operation failed. Would you like to continue? (y/n)" <<
             prompt << std::flush;
