@@ -65,19 +65,25 @@ int main(int argc, char* argv[]) {
     cp(step1 + nccInfo, forSD + nccInfo);
     rm(step1 + nccInfo);
 
-    cout << "We now need to copy some data to your 3DS SD Card." << std::endl;
+    cout << "We now need to copy some data to your 3DS SD Card." <<
+            " Please insert it.";
+    system("pause");
+
     std::string sdDrive = enterCopyMenu();
     if(exists(sdDrive + launcherdat)){
         mv(sdDrive + launcherdat, sdDrive + launcherdat + ".autobackup");
     }
     cpDirContents(forSD, sdDrive);
-
-    cout << '\n' << "Copy the data in " << enclose(forSD) << " to your " <<
-            "3DS SD Card. Turn on your 3DS. Go to System Settings" <<
+    cout << '\n' << "Safely remove your SD card. Put it in your 3DS" <<
+            " and turn it on. Go to System Settings" <<
             " > Other Settings > Profile > Nintendo DS Profile." <<
-            " Once you have retreived the xorpads, copy them to " <<
-            enclose(step2) << '.' << endl;
+            " Once it has finished working, turn off your 3DS and" <<
+            " re-insert the SD card into your computer." << endl;
     system("pause");
+
+    sdDrive = enterCopyMenu();
+
+    // Copy xorpads
 
     cp(rom, step2 + rom);
     cd(step2);
