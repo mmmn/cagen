@@ -21,6 +21,7 @@ std::string manualOrReload();
 void fail();
 void cd(std::string dir);
 void cp(std::string file, std::string location);
+void mv(std::string file, std::string destination);
 void rm(std::string file);
 void exec(std::string cmd);
 std::string enclose(std::string str);
@@ -154,21 +155,28 @@ void fail() {
 }
 void cd(std::string dir) {
     cout << "Changing dir to " << dir << " ... " << endl;
-    auto result = SetCurrentDirectory(dir.c_str());
+    BOOL result = SetCurrentDirectory(dir.c_str());
     cout << (result ? "Success." : "Fail.") << endl;
     if (result == 0)
         fail();
 }
 void cp(std::string file, std::string location) {
     cout << "Copying " << file << " to " << location << " ... " << endl;
-    auto result = CopyFile(file.c_str(), location.c_str(), FALSE);
+    BOOL result = CopyFile(file.c_str(), location.c_str(), FALSE);
+    cout << (result ? "Success." : "Fail.") << endl;
+    if (result == 0)
+        fail();
+}
+void mv(std::string file, std::string destination){
+    cout << "Renaming " << file << " to " << destination << " ... " << endl;
+    BOOL result = MoveFile(file.c_str(), destination.c_str());
     cout << (result ? "Success." : "Fail.") << endl;
     if (result == 0)
         fail();
 }
 void rm(std::string file) {
     cout << "Removing " << file << " ... " << endl;
-    auto result = DeleteFile(file.c_str());
+    BOOL result = DeleteFile(file.c_str());
     cout << (result ? "Success." : "Fail.") << endl;
     if (result == 0)
         fail();
