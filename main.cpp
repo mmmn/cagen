@@ -142,6 +142,9 @@ std::string enterCopyMenu(){
             }
         }
     }
+    else{
+        return manualOrReload();
+    }
 }
 std::string manualOrReload(){
     cout << "Would you like to reload the drives, " <<
