@@ -17,12 +17,6 @@ void exec(std::string cmd);
 std::string enclose(std::string str);
 
 int main(int argc, char* argv[]) {
-    cout << "CIA Auto Generator" << endl;
-    if (argc != 2 || argv[1] == "-h" || argv[1] == "--help"){
-        cout << "Usage: cagen.exe example.3ds";
-        exit(0);
-    }
-    std::string romName{argv[1]};
     const std::string step1{"Step 1/"};
     const std::string step2{"Step 2/"};
     const std::string forSD{"For 3DS SD card/"};
@@ -31,8 +25,14 @@ int main(int argc, char* argv[]) {
     const std::string nccInfo{"ncchinfo.bin"};
     const std::string makecia{"decrypt and make.bat"};
     const std::string installcia{"install.cia"};
+    const std::string rom{"rom.3ds"};
 
-    const std::string rom = "rom.3ds";
+    cout << "CIA Auto Generator" << endl;
+    if (argc != 2 || argv[1] == "-h" || argv[1] == "--help"){
+        cout << "Usage: cagen.exe example.3ds";
+        exit(0);
+    }
+    std::string romName{argv[1]};
 
     cp(romName, rom);
     cp(rom, step1 + rom);
@@ -72,8 +72,7 @@ int main(int argc, char* argv[]) {
     rm(rom);
     rm(forSD + nccInfo);
 
-    cout << "Success!" << endl;
-
+    cout << endl;
     return 0;
 }
 void fail() {
