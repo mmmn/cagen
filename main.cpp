@@ -184,7 +184,7 @@ void cp(std::string file, std::string location) {
 void cpDirContents(std::string dir, std::string destination, std::string wildcardExp){
     auto contents = listDir(dir, wildcardExp);
     for (auto &&file : contents){
-        cp(dir + file, destination);
+        cp(dir + file, destination + file);
     }
 }
 void mv(std::string file, std::string destination){
