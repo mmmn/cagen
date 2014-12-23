@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 
     cd("..");
     cp(step1 + nccInfo, forSD + nccInfo);
-    rm(enclose(step1 + nccInfo));
+    rm(step1 + nccInfo);
 
     cout << '\n' << "Copy the data in " << enclose(forSD) << " to your " <<
             "3DS SD Card. Turn on your 3DS. Go to System Settings" <<
@@ -63,11 +63,11 @@ int main(int argc, char* argv[]) {
     cianame[size-1] = 'a';
 
     cp(installcia, "..\\" + cianame);
-    rm(enclose(rom));
-    rm(enclose(installcia));
+    rm(rom);
+    rm(installcia);
     cd("..");
-    rm(enclose(rom));
-    rm(enclose(forSD + nccInfo));
+    rm(rom);
+    rm(forSD + nccInfo);
 
     cout << "Success!" << endl;
 
@@ -84,9 +84,7 @@ void cp(std::string file, std::string location) {
 }
 void rm(std::string file) {
     cout << "Removing " << file << " ... " << endl;
-    std::stringstream cmd;
-    cmd << "del " << file;
-    cout << ((system(cmd.str().c_str()) == 0) ? "Success." : "Fail.") << endl;
+    cout << (DeleteFile(file.c_str()) ? "Success." : "Fail.") << endl;
 }
 void exec(std::string cmd) {
     cout << "Executing " << cmd << " ... " << endl;
