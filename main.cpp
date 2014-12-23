@@ -24,6 +24,7 @@ void cp(std::string file, std::string destination);
 void cpDirContents(std::string dir, std::string destination, std::string wildcardExp = "*");
 void mv(std::string file, std::string destination);
 void rm(std::string file);
+void rmDirContents(std::string dir, std::string wildcardExp = "*");
 void exec(std::string cmd);
 bool exists(std::string path);
 std::string enclose(std::string str);
@@ -99,6 +100,10 @@ int main(int argc, char* argv[]) {
     cp(step2 + installcia, cianame);
     rm(step2 + rom);
     rm(step2 + installcia);
+    rmDirContents(step2, "*.xorpad");
+    rmDirContents(sdDrive, "*.xorpad");
+    rm(sdDrive + nccInfo);
+    rm(sdDrive + launcherdat);
     rm(rom);
     rm(forSD + nccInfo);
 
@@ -188,6 +193,12 @@ void cpDirContents(std::string dir, std::string destination, std::string wildcar
     auto contents = listDir(dir, wildcardExp);
     for (auto &&file : contents){
         cp(dir + file, destination + file);
+    }
+}
+void rmDirContents(std::string dir, std::string wildcardExp){
+    auto contents = listDir(dir, wildcardExp);
+    for (auto &&file : contents){
+        rm(dir + file);
     }
 }
 void mv(std::string file, std::string destination){
