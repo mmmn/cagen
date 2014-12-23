@@ -256,7 +256,7 @@ std::string find3dsDrive(std::vector<std::string> removableDrives) {
     for(auto &&drive : removableDrives){
         BOOL testPassed = TRUE;
         for (auto &&test : fileTests){
-            if (exists(drive + test)){
+            if (!exists(drive + test)){
                 testPassed = FALSE;
             }
         }
