@@ -7,6 +7,9 @@ using std::cout;
 using std::cin;
 using std::endl;
 
+const std::string prompt = "\n>";
+
+void fail();
 void cd(std::string dir);
 void cp(std::string file, std::string location);
 void rm(std::string file);
@@ -73,22 +76,50 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+void fail() {
+    std::string response;
+    cout << "The previous operation failed. Would you like to continue? (y/n)" <<
+            prompt << std::flush;
+    bool valid = false;
+    while (!valid){
+        getline(cin, response);
+        if (response == "n" || response == "no" ||
+            response == "N" || response == "No") {
+            exit(1);
+        }
+        else if (response == "y" || response == "yes"  ||
+                 response == "Y" || response == "Yes") {
+            valid = true;
+        }
+    }
+}
 void cd(std::string dir) {
     cout << "Changing dir to " << dir << " ... " << endl;
-    cout << ((SetCurrentDirectory(dir.c_str())) ? "Success." : "Fail.") << endl;
+    auto result = SetCurrentDirectory(dir.c_str());
+    cout << (result ? "Success." : "Fail.") << endl;
+    if (result == 0)
+        fail();
 }
 void cp(std::string file, std::string location) {
     cout << "Copying " << file << " to " << location << " ... " << endl;
-    cout << (CopyFile(file.c_str(), location.c_str(), FALSE)
-            ? "Success." : "Fail.") << endl;
+    auto result = CopyFile(file.c_str(), location.c_str(), FALSE);
+    cout << (result ? "Success." : "Fail.") << endl;
+    if (result == 0)
+        fail();
 }
 void rm(std::string file) {
     cout << "Removing " << file << " ... " << endl;
-    cout << (DeleteFile(file.c_str()) ? "Success." : "Fail.") << endl;
+    auto result = DeleteFile(file.c_str());
+    cout << (result ? "Success." : "Fail.") << endl;
+    if (result == 0)
+        fail();
 }
 void exec(std::string cmd) {
     cout << "Executing " << cmd << " ... " << endl;
-    cout << ((system(cmd.c_str()) == 0) ? "Success." : "Fail.") << endl;
+    auto result = system(cmd.c_str());
+    cout << ((result == 0) ? "Success." : "Fail.") << endl;
+    if (result != 0)
+        fail();
 }
 std::string enclose(std::string str) {
     std::stringstream result;
