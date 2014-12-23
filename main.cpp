@@ -20,9 +20,9 @@ int main(int argc, char* argv[]) {
         exit(0);
     }
     std::string romName{argv[1]};
-    const std::string step1{"Step 1\\"};
-    const std::string step2{"Step 2\\"};
-    const std::string forSD{"For 3DS SD card\\"};
+    const std::string step1{"Step 1/"};
+    const std::string step2{"Step 2/"};
+    const std::string forSD{"For 3DS SD card/"};
     const std::string python{"python"};
     const std::string ctrKeyGen{"ctrKeyGen.py"};
     const std::string nccInfo{"ncchinfo.bin"};
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
     cianame[size-2] = 'i';
     cianame[size-1] = 'a';
 
-    cp(installcia, "..\\" + cianame);
+    cp(installcia, "../" + cianame);
     rm(rom);
     rm(installcia);
     cd("..");
