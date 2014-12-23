@@ -10,6 +10,7 @@ using std::endl;
 
 const std::string prompt = "\n>";
 
+bool getYN();
 void fail();
 void cd(std::string dir);
 void cp(std::string file, std::string location);
@@ -87,21 +88,28 @@ int main(int argc, char* argv[]) {
     cout << endl;
     return 0;
 }
-void fail() {
+bool getYN(){
     std::string response;
-    cout << "The previous operation failed. Would you like to continue? (y/n)" <<
-            prompt << std::flush;
-    bool valid = false;
-    while (!valid){
+    while(true){
         getline(cin, response);
         if (response == "n" || response == "no" ||
-            response == "N" || response == "No") {
-            exit(1);
+                response == "N" || response == "No") {
+            return false;
         }
         else if (response == "y" || response == "yes"  ||
-                 response == "Y" || response == "Yes") {
-            valid = true;
+                response == "Y" || response == "Yes") {
+            return true;
         }
+    }
+}
+void fail() {
+    cout << "The previous operation failed. Would you like to continue? (y/n)" <<
+            prompt << std::flush;
+    if(getYN()){
+        return;
+    }
+    else{
+        exit(1);
     }
 }
 void cd(std::string dir) {
