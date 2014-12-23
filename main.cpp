@@ -21,13 +21,13 @@ std::string manualOrReload();
 void fail();
 void cd(std::string dir);
 void cp(std::string file, std::string destination);
-void cpDirContents(std::string dir, std::string destination);
+void cpDirContents(std::string dir, std::string destination, std::string wildcardExp = "*");
 void mv(std::string file, std::string destination);
 void rm(std::string file);
 void exec(std::string cmd);
 bool exists(std::string path);
 std::string enclose(std::string str);
-std::vector<std::string> listDir(std::string directory);
+std::vector<std::string> listDir(std::string directory, std::string wildcardExp);
 std::vector<std::string> getDrives();
 std::vector<std::string> getRemovableDrives(std::vector<std::string> drives);
 std::string find3dsDrive(std::vector<std::string> removableDrives);
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
     rm(step1 + nccInfo);
 
     cout << "We now need to copy some data to your 3DS SD Card." <<
-            " Please insert it.";
+            " Please insert it." << endl;
     system("pause");
 
     std::string sdDrive = enterCopyMenu();
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
     sdDrive = enterCopyMenu();
 
-    // Copy xorpads
+    cpDirContents(sdDrive, step2, "*.xorpad");
 
     cp(rom, step2 + rom);
     cd(step2);
@@ -106,14 +106,15 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 bool getYN(std::set<std::string> yes, std::set<std::string> no){
-    std::string response;
+    std::string response{};
+    response.reserve(10);
     while(true){
         getline(cin, response);
         if (yes.find(response) != yes.end()) {
-            return false;
+            return true;
         }
         else if (no.find(response) != no.end()) {
-            return true;
+            return false;
         }
     }
 }
@@ -123,7 +124,7 @@ std::string enterCopyMenu(){
     for (auto &&drive : drives){
         cout << drive << '\n';
     }
-    cout << "Auto-Locate 3DS SD Card?" << prompt << std::flush;
+    cout << "Auto-Locate 3DS SD Card? (y/n)" << prompt << std::flush;
     if (getYN()){
         auto foundSD = find3dsDrive(getRemovableDrives(getDrives()));
         if (foundSD == ""){ // Not found
@@ -180,8 +181,8 @@ void cp(std::string file, std::string location) {
     if (result == 0)
         fail();
 }
-void cpDirContents(std::string dir, std::string destination){
-    auto contents = listDir(dir);
+void cpDirContents(std::string dir, std::string destination, std::string wildcardExp){
+    auto contents = listDir(dir, wildcardExp);
     for (auto &&file : contents){
         cp(dir + file, destination);
     }
@@ -212,10 +213,10 @@ std::string enclose(std::string str) {
     result << '\"' << str << '\"';
     return result.str();
 }
-std::vector<std::string> listDir(std::string directory) {
+std::vector<std::string> listDir(std::string directory, std::string wildcardExp) {
     std::vector<std::string> list{};
     WIN32_FIND_DATA fileData;
-    auto fileHandle = FindFirstFile((directory + "*").c_str(), &fileData);
+    auto fileHandle = FindFirstFile((directory + wildcardExp).c_str(), &fileData);
     BOOL result;
     do{
         if (strcmp(fileData.cFileName, ".") != 0 &&
@@ -266,6 +267,6 @@ std::string find3dsDrive(std::vector<std::string> removableDrives) {
     return "";
 }
 bool exists(std::string path){
-    return GetFileAttributes(path.c_str()) == INVALID_FILE_ATTRIBUTES &&
-            GetLastError() == ERROR_FILE_NOT_FOUND;
+    return !(GetFileAttributes(path.c_str()) == INVALID_FILE_ATTRIBUTES &&
+            GetLastError() == ERROR_FILE_NOT_FOUND);
 }
