@@ -7,34 +7,11 @@ using std::cout;
 using std::cin;
 using std::endl;
 
-void cd(std::string dir){
-    cout << "Changing dir to " << dir << " ... " << endl;
-    cout << ((SetCurrentDirectory(dir.c_str())) ? "Success." : "Fail.") << endl;
-}
-
-void cp(std::string file, std::string location){
-    cout << "Copying " << file << " to " << location << " ... " << endl;
-    cout << (CopyFile(file.c_str(), location.c_str(), FALSE)
-            ? "Success." : "Fail.") << endl;
-}
-
-void rm(std::string file){
-    cout << "Removing " << file << " ... " << endl;
-    std::stringstream cmd;
-    cmd << "del " << file;
-    cout << ((system(cmd.str().c_str()) == 0) ? "Success." : "Fail.") << endl;
-}
-
-void exec(std::string cmd){
-    cout << "Executing " << cmd << " ... " << endl;
-    cout << ((system(cmd.c_str()) == 0) ? "Success." : "Fail.") << endl;
-}
-
-std::string enclose(std::string str){
-    std::stringstream result;
-    result << '\"' << str << '\"';
-    return result.str();
-}
+void cd(std::string dir);
+void cp(std::string file, std::string location);
+void rm(std::string file);
+void exec(std::string cmd);
+std::string enclose(std::string str);
 
 int main(int argc, char* argv[]) {
     cout << "CIA Auto Generator" << endl;
@@ -95,4 +72,28 @@ int main(int argc, char* argv[]) {
     cout << "Success!" << endl;
 
     return 0;
+}
+void cd(std::string dir) {
+    cout << "Changing dir to " << dir << " ... " << endl;
+    cout << ((SetCurrentDirectory(dir.c_str())) ? "Success." : "Fail.") << endl;
+}
+void cp(std::string file, std::string location) {
+    cout << "Copying " << file << " to " << location << " ... " << endl;
+    cout << (CopyFile(file.c_str(), location.c_str(), FALSE)
+            ? "Success." : "Fail.") << endl;
+}
+void rm(std::string file) {
+    cout << "Removing " << file << " ... " << endl;
+    std::stringstream cmd;
+    cmd << "del " << file;
+    cout << ((system(cmd.str().c_str()) == 0) ? "Success." : "Fail.") << endl;
+}
+void exec(std::string cmd) {
+    cout << "Executing " << cmd << " ... " << endl;
+    cout << ((system(cmd.c_str()) == 0) ? "Success." : "Fail.") << endl;
+}
+std::string enclose(std::string str) {
+    std::stringstream result;
+    result << '\"' << str << '\"';
+    return result.str();
 }
