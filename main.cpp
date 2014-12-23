@@ -95,10 +95,10 @@ int main(int argc, char* argv[]) {
     cianame[size-2] = 'i';
     cianame[size-1] = 'a';
 
-    cp(installcia, "..\\" + cianame);
-    rm(rom);
-    rm(installcia);
     cd("..");
+    cp(step2 + installcia, cianame);
+    rm(step2 + rom);
+    rm(step2 + installcia);
     rm(rom);
     rm(forSD + nccInfo);
 
@@ -132,7 +132,7 @@ std::string enterCopyMenu(){
             return manualOrReload();
         }
         else{
-            cout << "Is this the correct drive letter?\n" <<
+            cout << "Is this the correct drive letter? (y/n)\n" <<
                     foundSD << prompt << std::flush;
             if (getYN()){
                 return foundSD;
