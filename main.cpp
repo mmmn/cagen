@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <sstream>
+#include <vector>
 #include <windows.h>
 
 using std::cout;
@@ -15,6 +16,9 @@ void cp(std::string file, std::string location);
 void rm(std::string file);
 void exec(std::string cmd);
 std::string enclose(std::string str);
+std::vector<std::string> getDrives();
+std::vector<std::string> getRemovableDrives(std::vector<std::string> drives);
+std::string find3dsDrive(std::vector<std::string> removableDrives);
 
 int main(int argc, char* argv[]) {
     const std::string step1{"Step 1/"};
@@ -47,6 +51,14 @@ int main(int argc, char* argv[]) {
     cd("..");
     cp(step1 + nccInfo, forSD + nccInfo);
     rm(step1 + nccInfo);
+
+    cout << '\n' << "Available Drives: \n" ;
+    auto drives = getDrives();
+    for (auto &&drive : drives){
+        cout << drive << '\n';
+    }
+
+    std::string drive3ds = find3dsDrive(getRemovableDrives(getDrives()));
 
     cout << '\n' << "Copy the data in " << enclose(forSD) << " to your " <<
             "3DS SD Card. Turn on your 3DS. Go to System Settings" <<
@@ -124,4 +136,43 @@ std::string enclose(std::string str) {
     std::stringstream result;
     result << '\"' << str << '\"';
     return result.str();
+}
+std::vector<std::string> getDrives() {
+    std::vector<std::string> drives{};
+    const int maxlen = 26*4+1;
+    char namesBuffer[maxlen];
+    GetLogicalDriveStrings(maxlen, namesBuffer);
+    char* p = namesBuffer;
+    while(*p != '\0'){
+        auto nameSize = strlen(p);
+        drives.push_back(std::string{p, p+nameSize});
+        p += nameSize+1;
+    }
+    return drives;
+}
+std::vector<std::string> getRemovableDrives(std::vector<std::string> drives) {
+    std::vector<std::string> removables{};
+    for(auto &&drive : drives){
+        auto driveType = GetDriveType(drive.c_str());
+        if(driveType == DRIVE_REMOVABLE){
+            removables.push_back(drive);
+        }
+    }
+    return removables;
+}
+std::string find3dsDrive(std::vector<std::string> removableDrives) {
+    std::vector<std::string> fileTests{"Nintendo 3DS"};
+    for(auto &&drive : removableDrives){
+        BOOL testPassed = TRUE;
+        for (auto &&test : fileTests){
+            if (GetFileAttributes((drive + test).c_str()) == INVALID_FILE_ATTRIBUTES &&
+                    GetLastError() == ERROR_FILE_NOT_FOUND){
+                testPassed = FALSE;
+            }
+        }
+        if (testPassed){
+            return drive;
+        }
+    }
+    return "";
 }
