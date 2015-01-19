@@ -100,8 +100,13 @@ int main(int argc, char* argv[]) {
     cp(step2 + installcia, cianame);
     rm(step2 + rom);
     rm(step2 + installcia);
-    rmDirContents(step2, "*.xorpad");
-    rmDirContents(sdDrive, "*.xorpad");
+    cout << "Keep xorpads?" << prompt << std::flush;
+    if(getYN()){
+
+    } else {
+        rmDirContents(step2, "*.xorpad");
+        rmDirContents(sdDrive, "*.xorpad");
+    }
     rm(sdDrive + nccInfo);
     rm(sdDrive + launcherdat);
     rm(rom);
