@@ -109,6 +109,7 @@ int main(int argc, char* argv[]) {
     }
     rm(sdDrive + nccInfo);
     rm(sdDrive + launcherdat);
+    mv(sdDrive + launcherdat + ".autobackup", sdDrive + launcherdat);
     rm(rom);
     rm(forSD + nccInfo);
 
