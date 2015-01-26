@@ -24,6 +24,7 @@ void cp(std::string file, std::string destination);
 void cpDirContents(std::string dir, std::string destination, std::string wildcardExp = "*");
 void mv(std::string file, std::string destination);
 void rm(std::string file);
+void rmDir(std::string dir);
 void rmDirContents(std::string dir, std::string wildcardExp = "*");
 void exec(std::string cmd);
 bool exists(std::string path);
@@ -60,14 +61,12 @@ int main(int argc, char* argv[]) {
     std::string romName{argv[1]};
 
     cp(romName, rom);
-    cp(rom, step1 + rom);
+    mv(rom, step1 + rom);
     cd(step1);
 
     std::stringstream cmd;
     cmd << python << ' ' << enclose(ctrKeyGen) << ' ' << enclose(rom);
     exec(cmd.str());
-
-    rm(rom);
 
     cd("..");
     cp(step1 + nccInfo, forSD + nccInfo);
@@ -93,7 +92,7 @@ int main(int argc, char* argv[]) {
 
     cpDirContents(sdDrive, step2, "*.xorpad");
 
-    cp(rom, step2 + rom);
+    mv(step1 + rom, step2 + rom);
     cd(step2);
     exec(enclose("" + makecia));
     resetConsoleColor();
@@ -109,7 +108,8 @@ int main(int argc, char* argv[]) {
 
     rm(step2 + rom);
     rm(step2 + installcia);
-    rmDirContents(step2 + encr_bin_dir, "");
+    rmDirContents(step2 + encr_bin_dir, "*.*");
+    rmDir(step2 + encr_bin_dir);
 
     rmDirContents(sdDrive, "*.xorpad");
     rm(sdDrive + nccInfo);
@@ -122,18 +122,20 @@ int main(int argc, char* argv[]) {
     if(getYN()){
         cout << "xorpads won't be deleted." << endl;
     } else {
-        rmDirContents(step2 + xorpads_dir, "");
+        rmDirContents(step2 + xorpads_dir, "*.*");
+        rmDir(step2 + xorpads_dir);
     }
 
     cout << "Keep anything else? (decrypted rom, exefs) (y/n)" << prompt << std::flush;
     if(getYN()){
         cout << decr_bin_dir << " and " << exefs_dir << " won't be deleted." << endl;
     } else {
-        rmDirContents(step2 + decr_bin_dir, "");
-        rmDirContents(step2 + exefs_dir, "");
+        rmDirContents(step2 + decr_bin_dir, "*.*");
+        rmDir(step2 + decr_bin_dir);
+        rmDirContents(step2 + exefs_dir, "*.*");
+        rmDir(step2 + exefs_dir);
     }
 
-    rm(rom);
     rm(forSD + nccInfo);
 
     cout << endl;
@@ -240,6 +242,13 @@ void mv(std::string file, std::string destination){
 void rm(std::string file) {
     cout << "Removing " << file << " ... " << endl;
     BOOL result = DeleteFile(file.c_str());
+    cout << (result ? "Success." : "Fail.") << endl;
+    if (result == 0)
+        fail();
+}
+void rmDir(std::string dir) {
+    cout << "Removing directory " << dir << " ... " << endl;
+    auto result = RemoveDirectory(dir.c_str());
     cout << (result ? "Success." : "Fail.") << endl;
     if (result == 0)
         fail();
