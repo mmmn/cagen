@@ -1,7 +1,7 @@
 CIA Auto Generator
 ==================
 
-CIA Auto Generator is a non-portable, poorly-written "script" that was thrown 
+CIA Auto Generator is a non-portable script that was thrown 
 together to speed up the generation of `.cia` files from `.3ds` files. It 
 requires [Queno138's CIA conversion kit][1], and it **doesn't** come with 
 `slot0x25KeyX.bin`.
