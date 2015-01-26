@@ -32,6 +32,7 @@ std::vector<std::string> listDir(std::string directory, std::string wildcardExp)
 std::vector<std::string> getDrives();
 std::vector<std::string> getRemovableDrives(std::vector<std::string> drives);
 std::string find3dsDrive(std::vector<std::string> removableDrives);
+void resetConsoleColor();
 
 int main(int argc, char* argv[]) {
     const std::string step1{"Step 1\\"};
@@ -44,6 +45,12 @@ int main(int argc, char* argv[]) {
     const std::string installcia{"install.cia"};
     const std::string launcherdat{"Launcher.dat"};
     const std::string rom{"rom.3ds"};
+    const std::string xorpads_dir{"xorpads\\"};
+    const std::string exefs_dir{"exefs\\"};
+    const std::string encr_bin_dir{"encrypted_bin\\"};
+    const std::string decr_bin_dir{"decrypted\\"};
+    const std::string deleteme{"DeleteMe.bin"};
+    const std::string mset{"MsetForBoss.dat"};
 
     cout << "CIA Auto Generator" << endl;
     if (argc != 2 || argv[1] == "-h" || argv[1] == "--help"){
@@ -89,6 +96,7 @@ int main(int argc, char* argv[]) {
     cp(rom, step2 + rom);
     cd(step2);
     exec(enclose("" + makecia));
+    resetConsoleColor();
 
     std::string cianame = romName;
     auto size = cianame.size();
@@ -98,18 +106,33 @@ int main(int argc, char* argv[]) {
 
     cd("..");
     cp(step2 + installcia, cianame);
+
     rm(step2 + rom);
     rm(step2 + installcia);
-    cout << "Keep xorpads?" << prompt << std::flush;
-    if(getYN()){
+    rmDirContents(step2 + encr_bin_dir, "");
 
-    } else {
-        rmDirContents(step2, "*.xorpad");
-        rmDirContents(sdDrive, "*.xorpad");
-    }
+    rmDirContents(sdDrive, "*.xorpad");
     rm(sdDrive + nccInfo);
     rm(sdDrive + launcherdat);
+    rm(sdDrive + deleteme);
+    if (exists(sdDrive + mset)) rm(sdDrive + mset);
     mv(sdDrive + launcherdat + ".autobackup", sdDrive + launcherdat);
+
+    cout << "Keep xorpads?" << prompt << std::flush;
+    if(getYN()){
+        cout << "xorpads won't be deleted." << endl;
+    } else {
+        rmDirContents(step2 + xorpads_dir, "");
+    }
+
+    cout << "Keep anything else? (decrypted rom, exefs) (y/n)" << prompt << std::flush;
+    if(getYN()){
+        cout << decr_bin_dir << " and " << exefs_dir << " won't be deleted." << endl;
+    } else {
+        rmDirContents(step2 + decr_bin_dir, "");
+        rmDirContents(step2 + exefs_dir, "");
+    }
+
     rm(rom);
     rm(forSD + nccInfo);
 
@@ -289,4 +312,9 @@ std::string find3dsDrive(std::vector<std::string> removableDrives) {
 bool exists(std::string path){
     return !(GetFileAttributes(path.c_str()) == INVALID_FILE_ATTRIBUTES &&
             GetLastError() == ERROR_FILE_NOT_FOUND);
+}
+
+void resetConsoleColor() {
+    auto out_handle = GetStdHandle( STD_OUTPUT_HANDLE );
+    SetConsoleTextAttribute( out_handle, 0x0F );
 }
