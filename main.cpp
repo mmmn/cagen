@@ -60,6 +60,18 @@ int main(int argc, char* argv[]) {
     }
     std::string romName{argv[1]};
 
+    if (exists(rom)){
+        cout << "Warning! Your rom is named \"" << rom << "\". " <<
+                "If you continue, \"" << rom << "\" will be deleted " <<
+                "at the end of the process." << endl;
+        cout << "Continue? (y/n)" << prompt << std::flush;
+        if (getYN()){
+
+        } else {
+            exit(0);
+        }
+    }
+
     cp(romName, rom);
     mv(rom, step1 + rom);
     cd(step1);
